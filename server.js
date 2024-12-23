@@ -27,7 +27,9 @@ app.get('/runs', (req, res) => {
 app.post('/runs', (req, res) => {
     const newRun = {
         id: 12345 + runs.length,
-        ...req.body
+        _id: `12345${runs.length}`, // Ensure unique _id
+        ...req.body,
+        dateRan: new Date().toISOString() // Ensure dateRan is set to current date
     };
     runs.push(newRun);
     res.status(201).json(newRun);
@@ -46,9 +48,9 @@ app.put('/runs/:id', (req, res) => {
 });
 
 // DELETE a run by ID
-app.delete('/runs/:id', (req, res) => {
-    const { id } = req.params;
-    const index = runs.findIndex(run => run.id === parseInt(id));
+app.delete('/runs/:_id', (req, res) => {
+    const { _id } = req.params;
+    const index = runs.findIndex(run => run._id === _id);
     if (index !== -1) {
         const deletedRun = runs.splice(index, 1);
         res.json(deletedRun);
