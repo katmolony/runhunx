@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Mock runs data matching your RunModel
-let runs = Array.from({ length: 30 }, (_, i) => ({
+let runs = Array.from({ length: 5 }, (_, i) => ({
     id: 12345 + i,
     _id: `12345${i}`,
     unitType: `metre ${i}`,
@@ -21,6 +21,17 @@ let runs = Array.from({ length: 30 }, (_, i) => ({
 // GET all runs
 app.get('/runs', (req, res) => {
     res.json(runs);
+});
+
+// GET a single run by ID
+app.get('/runs/:id', (req, res) => {
+    const { id } = req.params;
+    const run = runs.find(run => run.id === parseInt(id));
+    if (run) {
+        res.json(run);
+    } else {
+        res.status(404).send('Run not found');
+    }
 });
 
 // POST a new run
