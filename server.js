@@ -14,7 +14,7 @@ let runs = Array.from({ length: 5 }, (_, i) => ({
     _id: `12345${i}`,
     unitType: `metre ${i}`,
     distanceAmount: i,
-    message: `Message ${i}`,
+    message: `Run ${i}`,
     dateRan: new Date().toISOString()
 }));
 
