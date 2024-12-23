@@ -12,7 +12,7 @@ app.use(cors());
 let runs = Array.from({ length: 5 }, (_, i) => ({
     id: 12345 + i,
     _id: `12345${i}`,
-    unitType: `metre ${i}`,
+    unitType: `metres`,
     distanceAmount: i,
     message: `Run ${i}`,
     dateRan: new Date().toISOString()
