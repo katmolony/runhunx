@@ -63,8 +63,8 @@ app.delete('/runs/:_id', (req, res) => {
     const { _id } = req.params;
     const index = runs.findIndex(run => run._id === _id);
     if (index !== -1) {
-        const deletedRun = runs.splice(index, 1);
-        res.json(deletedRun);
+        const [deletedRun] = runs.splice(index, 1); // Destructure to get the object
+        res.json(deletedRun); // Return the object directly
     } else {
         res.status(404).send('Run not found');
     }
