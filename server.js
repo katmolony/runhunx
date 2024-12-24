@@ -28,7 +28,7 @@ app.get('/runs/:_id', (req, res) => {
     const { _id } = req.params;
     const run = runs.find(run => run._id === _id);
     if (run) {
-        res.json(run);
+        res.json([run]); // Return the run as an array with a single element
     } else {
         res.status(404).send('Run not found');
     }
