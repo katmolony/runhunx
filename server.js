@@ -24,9 +24,9 @@ app.get('/runs', (req, res) => {
 });
 
 // GET a single run by ID
-app.get('/runs/:id', (req, res) => {
-    const { id } = req.params;
-    const run = runs.find(run => run.id === parseInt(id));
+app.get('/runs/:_id', (req, res) => {
+    const { _id } = req.params;
+    const run = runs.find(run => run._id === _id);
     if (run) {
         res.json(run);
     } else {
