@@ -47,12 +47,12 @@ app.post('/runs', (req, res) => {
 });
 
 // UPDATE a run by ID
-app.put('/runs/:id', (req, res) => {
-    const { id } = req.params;
-    const index = runs.findIndex(run => run.id === parseInt(id));
+app.put('/runs/:_id', (req, res) => {
+    const { _id } = req.params;
+    const index = runs.findIndex(run => run._id === _id); // Match using _id
     if (index !== -1) {
-        runs[index] = { ...runs[index], ...req.body };
-        res.json(runs[index]);
+        runs[index] = { ...runs[index], ...req.body }; // Merge existing and new data
+        res.json(runs[index]); // Return updated run
     } else {
         res.status(404).send('Run not found');
     }
