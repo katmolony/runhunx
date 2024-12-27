@@ -50,11 +50,11 @@ app.get('/runs/:email/:id', (req, res) => {
 app.post('/runs/:email', (req, res) => {
     const { email } = req.params;
     const newRun = {
-        id: runs.length > 0 ? runs[runs.length - 1].id + 1 : 12345, // Unique id
-        _id: `id-${Date.now()}`, // Generate a unique _id using timestamp
-        email, // Set email from URL parameter
+        id: runs.length > 0 ? runs[runs.length - 1].id + 1 : 12345, // Ensure unique id
+        _id: req.body._id && req.body._id !== "N/A" ? req.body._id : `id-${Date.now()}`, // Use provided _id or generate one
+        email,
         ...req.body,
-        dateRan: new Date().toISOString() // Ensure dateRan is set to current date
+        dateRan: req.body.dateRan || new Date().toISOString() // Use provided or current date
     };
     runs.push(newRun);
     res.status(201).json(newRun);
