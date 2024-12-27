@@ -87,3 +87,51 @@ app.delete('/runs/:email/:id', (req, res) => {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+// Mock users data matching UserProfileModel
+let users = [];
+
+app.get('/users/:email', (req, res) => {
+    const { email } = req.params;
+    const user = users.find(user => user.email === email);
+    if (user) {
+        res.json(user);
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
+app.post('/users', (req, res) => {
+    const newUser = {
+        userId: users.length > 0 ? users[users.length - 1].userId + 1 : 1, // Auto-increment userId
+        ...req.body,
+        totalDistanceRun: req.body.totalDistanceRun || 0.0,
+        totalRuns: req.body.totalRuns || 0,
+        averagePace: req.body.averagePace || 0.0,
+        preferredUnit: req.body.preferredUnit || "km"
+    };
+    users.push(newUser);
+    res.status(201).json(newUser);
+});
+
+app.put('/users/:email', (req, res) => {
+    const { email } = req.params;
+    const index = users.findIndex(user => user.email === email);
+    if (index !== -1) {
+        users[index] = { ...users[index], ...req.body }; // Merge existing and new data
+        res.json(users[index]);
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
+app.delete('/users/:email', (req, res) => {
+    const { email } = req.params;
+    const index = users.findIndex(user => user.email === email);
+    if (index !== -1) {
+        const [deletedUser] = users.splice(index, 1); // Remove and return the deleted user
+        res.json(deletedUser);
+    } else {
+        res.status(404).send('User not found');
+    }
+});
