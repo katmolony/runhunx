@@ -52,7 +52,7 @@ app.post('/runs/:email', (req, res) => {
     const newRun = {
         id: runs.length > 0 ? runs[runs.length - 1].id + 1 : 12345, // Ensure unique id
         _id: req.body._id && req.body._id !== "N/A" ? req.body._id : `id-${Date.now()}`, // Use provided _id or generate one
-        email,
+        email: req.body.email || email, // Use email from request body, otherwise from the URL
         ...req.body,
         dateRan: req.body.dateRan || new Date().toISOString() // Use provided or current date
     };
