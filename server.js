@@ -9,15 +9,19 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Mock runs data matching your updated RunModel
-let runs = Array.from({ length: 5 }, (_, i) => ({
-    id: 12345 + i,
-    _id: `12345${i}`,
-    unitType: `metres`,
-    distanceAmount: i,
-    message: `Run ${i}`,
-    dateRan: new Date().toISOString(),
-    email: `homer@gmail.com` // Add email field
-}));
+const runs = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - i); // Subtract i days from today
+    return {
+        id: 12345 + i,
+        _id: `12345${i}`,
+        unitType: "metres",
+        distanceAmount: i, // Distance in meters
+        message: `Run ${i}`,
+        dateRan: date.toISOString(), // Format as ISO string
+        email: "homer@gmail.com"
+    };
+});
 
 // Mock users data matching UserProfileModel
 let users = [
