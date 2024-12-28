@@ -16,7 +16,7 @@ let runs = Array.from({ length: 5 }, (_, i) => ({
     distanceAmount: i,
     message: `Run ${i}`,
     dateRan: new Date().toISOString(),
-    email: `runner${i}@example.com` // Add email field
+    email: `homer@gmail.com` // Add email field
 }));
 
 // Mock users data matching UserProfileModel
@@ -40,6 +40,16 @@ let users = [
         totalRuns: 40,
         averagePace: 6.0,
         preferredUnit: "miles"
+    },
+    {
+        userId: 2,
+        name: "Homer",
+        email: "homer@gmail.com",
+        profilePictureUrl: "https://example.com/images/homer.jpg",
+        totalDistanceRun: 0.0,
+        totalRuns: 0,
+        averagePace: 0.0,
+        preferredUnit: "km"
     }
 ];
 
