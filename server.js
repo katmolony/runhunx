@@ -40,39 +40,46 @@ let users = [
         totalRuns: 40,
         averagePace: 6.0,
         preferredUnit: "miles"
-    },
-    {
-        userId: 3,
-        name: "Alice Johnson",
-        email: "alice.johnson@example.com",
-        profilePictureUrl: "https://example.com/images/alice_johnson.jpg",
-        totalDistanceRun: 300.0,
-        totalRuns: 50,
-        averagePace: 4.8,
-        preferredUnit: "km"
-    },
-    {
-        userId: 4,
-        name: "Bob Brown",
-        email: "bob.brown@example.com",
-        profilePictureUrl: null,
-        totalDistanceRun: 50.3,
-        totalRuns: 10,
-        averagePace: 5.5,
-        preferredUnit: "miles"
     }
 ];
+
+// Function to calculate user statistics from their runs
+function calculateUserStats(email) {
+    // Filter the runs for the user by email
+    const userRuns = runs.filter(run => run.email === email);
+
+    const totalDistanceRun = userRuns.reduce((total, run) => total + run.distanceAmount, 0);
+    const totalRuns = userRuns.length;
+    
+    // Average pace is calculated as total distance divided by total runs (simple example)
+    const averagePace = totalRuns > 0 ? totalDistanceRun / totalRuns : 0;
+
+    return {
+        totalDistanceRun,
+        totalRuns,
+        averagePace
+    };
+}
 
 // GET all users
 app.get('/users', (req, res) => {
     res.json(users);
 });
 
-// GET a user by email
+// GET a user by email with updated profile stats
 app.get('/users/:email', (req, res) => {
     const { email } = req.params;
     const user = users.find(user => user.email === email);
+
     if (user) {
+        // Recalculate user stats based on runs
+        const stats = calculateUserStats(email);
+
+        // Update user profile with calculated stats
+        user.totalDistanceRun = stats.totalDistanceRun;
+        user.totalRuns = stats.totalRuns;
+        user.averagePace = stats.averagePace;
+
         res.json(user);
     } else {
         res.status(404).send('User not found');
@@ -93,12 +100,14 @@ app.post('/users', (req, res) => {
     res.status(201).json(newUser);
 });
 
-// UPDATE a user by email
+// UPDATE a user by email with recalculated stats
 app.put('/users/:email', (req, res) => {
     const { email } = req.params;
     const index = users.findIndex(user => user.email === email);
     if (index !== -1) {
-        users[index] = { ...users[index], ...req.body }; // Merge existing and new data
+        // Recalculate user stats based on runs
+        const stats = calculateUserStats(email);
+        users[index] = { ...users[index], ...req.body, ...stats }; // Merge existing and new data
         res.json(users[index]);
     } else {
         res.status(404).send('User not found');
@@ -118,7 +127,7 @@ app.delete('/users/:email', (req, res) => {
 });
 
 // Runs Endpoints
-// GET all runs, regardless of email
+// GET all runs
 app.get('/runs', (req, res) => {
     res.json(runs);
 });
@@ -145,39 +154,78 @@ app.get('/runs/:email/:id', (req, res) => {
     }
 });
 
-// POST a new run for a specific email
+// POST a new run for a specific email and update user profile
 app.post('/runs/:email', (req, res) => {
     const { email } = req.params;
     const newRun = {
-        id: runs.length > 0 ? runs[runs.length - 1].id + 1 : 12345, // Ensure unique id
-        _id: req.body._id && req.body._id !== "N/A" ? req.body._id : `id-${Date.now()}`, // Use provided _id or generate one
-        email: req.body.email || email, // Use email from request body, otherwise from the URL
+        id: runs.length > 0 ? runs[runs.length - 1].id + 1 : 12345,
+        _id: req.body._id && req.body._id !== "N/A" ? req.body._id : `id-${Date.now()}`,
+        email: req.body.email || email,
         ...req.body,
-        dateRan: req.body.dateRan || new Date().toISOString() // Use provided or current date
+        dateRan: req.body.dateRan || new Date().toISOString()
     };
+
+    // Add the new run
     runs.push(newRun);
-    res.status(201).json(newRun);
+
+    // Recalculate the user stats after adding the new run
+    const stats = calculateUserStats(email);
+    const user = users.find(user => user.email === email);
+    if (user) {
+        user.totalDistanceRun = stats.totalDistanceRun;
+        user.totalRuns = stats.totalRuns;
+        user.averagePace = stats.averagePace;
+        res.status(201).json(newRun);
+    } else {
+        res.status(404).send('User not found');
+    }
 });
 
-// UPDATE a run by email and id
+// UPDATE a run by email and id and recalculate stats
 app.put('/runs/:email/:id', (req, res) => {
     const { email, id } = req.params;
     const index = runs.findIndex(run => run.email === email && run._id === id);
+    
     if (index !== -1) {
-        runs[index] = { ...runs[index], ...req.body }; // Merge existing and new data
-        res.json(runs[index]); // Return updated run
+        // Update the run
+        runs[index] = { ...runs[index], ...req.body };
+
+        // Recalculate the user stats after updating the run
+        const stats = calculateUserStats(email);
+        const user = users.find(user => user.email === email);
+        if (user) {
+            user.totalDistanceRun = stats.totalDistanceRun;
+            user.totalRuns = stats.totalRuns;
+            user.averagePace = stats.averagePace;
+            res.json(runs[index]);
+        } else {
+            res.status(404).send('User not found');
+        }
     } else {
         res.status(404).send('Run not found');
     }
 });
 
-// DELETE a run by email and id
+// DELETE a run by email and id and recalculate stats
 app.delete('/runs/:email/:id', (req, res) => {
     const { email, id } = req.params;
     const index = runs.findIndex(run => run.email === email && run._id === id);
+
     if (index !== -1) {
-        const [deletedRun] = runs.splice(index, 1); // Destructure to get the object
-        res.json(deletedRun); // Return the object directly
+        // Remove the run
+        const [deletedRun] = runs.splice(index, 1);
+
+        // Recalculate the user stats after deleting the run
+        const stats = calculateUserStats(email);
+        const user = users.find(user => user.email === email);
+        if (user) {
+            user.totalDistanceRun = stats.totalDistanceRun;
+            user.totalRuns = stats.totalRuns;
+            user.averagePace = stats.averagePace;
+            res.json(deletedRun);
+        } else {
+            res.status(404).send('User not found');
+        }
     } else {
         res.status(404).send('Run not found');
     }
