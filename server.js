@@ -50,14 +50,15 @@ function calculateUserStats(email) {
 
     const totalDistanceRun = userRuns.reduce((total, run) => total + run.distanceAmount, 0);
     const totalRuns = userRuns.length;
-    
+
     // Average pace is calculated as total distance divided by total runs (simple example)
     const averagePace = totalRuns > 0 ? totalDistanceRun / totalRuns : 0;
 
+    // Round totalDistanceRun and averagePace to 2 decimal places
     return {
-        totalDistanceRun,
+        totalDistanceRun: parseFloat(totalDistanceRun.toFixed(2)),
         totalRuns,
-        averagePace
+        averagePace: parseFloat(averagePace.toFixed(2))
     };
 }
 
